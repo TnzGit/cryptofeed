@@ -27,7 +27,7 @@ class MongoCallback(BackendQueue):
 
     async def writer(self):
         if self.username and self.password:
-            uri = "mongodb://{self.username}:{self.password}@{self.host}:{self.port}".format(username=self.username, password=self.password, host=self.host, port=self.port)
+            uri = "mongodb://{username}:{password}@{host}:{port}".format(username=self.username, password=self.password, host=self.host, port=self.port)
         else:
             uri = "mongodb://{host}:{port}".format(host=self.host, port=self.port)
         conn = motor.motor_asyncio.AsyncIOMotorClient(uri)
