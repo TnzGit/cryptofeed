@@ -14,9 +14,11 @@ from cryptofeed.backends.backend import BackendBookCallback, BackendCallback, Ba
 
 
 class MongoCallback(BackendQueue):
-    def __init__(self, db, host='127.0.0.1', port=27017, key=None, none_to=None, numeric_type=str, **kwargs):
+    def __init__(self, db, host='127.0.0.1', port=27017, username=None, password=None, key=None, none_to=None, numeric_type=str, **kwargs):
         self.host = host
         self.port = port
+        self.username = username
+        self.password = password
         self.db = db
         self.numeric_type = numeric_type
         self.none_to = none_to
@@ -24,7 +26,11 @@ class MongoCallback(BackendQueue):
         self.running = True
 
     async def writer(self):
-        conn = motor.motor_asyncio.AsyncIOMotorClient(self.host, self.port)
+        if self.username and self.password:
+            uri = "mongodb://{self.username}:{self.password}@{self.host}:{self.port}".format(username=self.username, password=self.password, host=self.host, port=self.port)
+        else:
+            uri = "mongodb://{host}:{port}".format(host=self.host, port=self.port)
+        conn = motor.motor_asyncio.AsyncIOMotorClient(uri)
         db = conn[self.db]
         while self.running:
             async with self.read_queue() as updates:
