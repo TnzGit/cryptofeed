@@ -279,7 +279,7 @@ class Binance(Feed, BinanceRestMixin):
                     max_depth = d
                     break
 
-        resp = await self.http_conn.read(self.rest_endpoints[0].route('l2book', self.sandbox).format(pair, max_depth))
+        resp = await self.http_conn.read(self.rest_endpoints[0].route('l2book', self.sandbox).format(pair, max_depth), retry_count=1)
         resp = json.loads(resp, parse_float=Decimal)
         timestamp = self.timestamp_normalize(resp['E']) if 'E' in resp else None
 
