@@ -131,13 +131,11 @@ class BackendBookCallback:
 
 class BackendFundingCallback:
     async def __call__(self, dtype, receipt_timestamp: float):
-        if (time.time() - receipt_timestamp > self.snapshot_interval) and self.write_allowed:
+        if receipt_timestamp%self.snapshot_interval - self.time_last_received%self.snapshot_interval < 0:
+            logging.info('time is right, writing...')
             data = dtype.to_dict(numeric_type=self.numeric_type, none_to=self.none_to)
             if not dtype.timestamp:
                 data['timestamp'] = receipt_timestamp
             data['receipt_timestamp'] = receipt_timestamp
             await self.write(data)
-            self.write_allowed = False
-        elif not self.write_allowed:
-            if time.time() - receipt_timestamp > self.snapshot_interval/2:
-                self.write_allowed = True
+        self.time_last_received = receipt_timestamp

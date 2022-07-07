@@ -53,7 +53,7 @@ class FundingMongo(MongoCallback, BackendFundingCallback):
 
     def __init__(self, *args, snapshot_interval=300, **kwargs):
         self.snapshot_interval = snapshot_interval
-        self.write_allowed = True
+        self.time_last_received = 0
         super().__init__(*args, **kwargs)
 
 
