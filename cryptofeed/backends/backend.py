@@ -4,7 +4,7 @@ Copyright (C) 2017-2022 Bryant Moscon - bmoscon@gmail.com
 Please see the LICENSE file for the terms and conditions
 associated with this software.
 '''
-import asyncio
+import asyncio, time
 from asyncio.queues import Queue
 from multiprocessing import Pipe, Process
 from contextlib import asynccontextmanager
@@ -127,3 +127,17 @@ class BackendBookCallback:
             if self.snapshot_interval <= self.snapshot_count[book.symbol] and book.delta:
                 await self._write_snapshot(book, receipt_timestamp)
                 self.snapshot_count[book.symbol] = 0
+
+
+class BackendFundingCallback:
+    async def __call__(self, dtype, receipt_timestamp: float):
+        if (time.time() - receipt_timestamp > self.snapshot_interval) and self.write_allowed:
+            data = dtype.to_dict(numeric_type=self.numeric_type, none_to=self.none_to)
+            if not dtype.timestamp:
+                data['timestamp'] = receipt_timestamp
+            data['receipt_timestamp'] = receipt_timestamp
+            await self.write(data)
+            self.write_allowed = False
+        elif not self.write_allowed:
+            if time.time() - receipt_timestamp > self.snapshot_interval/2:
+                self.write_allowed = True
