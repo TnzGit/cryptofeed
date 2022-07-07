@@ -152,7 +152,7 @@ class HTTPAsyncConn(AsyncConnection):
             self.sent = 0
             self.received = 0
 
-    async def read(self, address: str, header=None, params=None, return_headers=False, retry_count=0, retry_delay=60) -> str:
+    async def read(self, address: str, header=None, params=None, return_headers=False, retry_count=1, retry_delay=60) -> str:
         if not self.is_open:
             await self._open()
 
