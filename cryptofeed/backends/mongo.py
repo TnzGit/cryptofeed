@@ -10,7 +10,7 @@ from datetime import timezone, datetime as dt
 import bson
 import motor.motor_asyncio
 
-from cryptofeed.backends.backend import BackendFundingCallback, BackendBookCallback, BackendCallback, BackendQueue
+from cryptofeed.backends.backend import BackendIntervalCallback, BackendBookCallback, BackendCallback, BackendQueue
 
 
 class MongoCallback(BackendQueue):
@@ -48,10 +48,10 @@ class TradeMongo(MongoCallback, BackendCallback):
     default_key = 'trades'
 
 
-class FundingMongo(MongoCallback, BackendFundingCallback):
+class FundingMongo(MongoCallback, BackendIntervalCallback):
     default_key = 'funding'
 
-    def __init__(self, *args, snapshot_interval=300, **kwargs):
+    def __init__(self, *args, snapshot_interval=60, **kwargs):
         self.snapshot_interval = snapshot_interval
         self.time_last_received = 0
         super().__init__(*args, **kwargs)
@@ -71,9 +71,12 @@ class TickerMongo(MongoCallback, BackendCallback):
     default_key = 'ticker'
 
 
-class OpenInterestMongo(MongoCallback, BackendCallback):
+class OpenInterestMongo(MongoCallback, BackendIntervalCallback):
     default_key = 'open_interest'
-
+    def __init__(self, *args, snapshot_interval=60, **kwargs):
+        self.snapshot_interval = snapshot_interval
+        self.time_last_received = 0
+        super().__init__(*args, **kwargs)
 
 class LiquidationsMongo(MongoCallback, BackendCallback):
     default_key = 'liquidations'

@@ -129,7 +129,7 @@ class BackendBookCallback:
                 self.snapshot_count[book.symbol] = 0
 
 
-class BackendFundingCallback:
+class BackendIntervalCallback:
     async def __call__(self, dtype, receipt_timestamp: float):
         if receipt_timestamp%self.snapshot_interval - self.time_last_received%self.snapshot_interval < 0:
             data = dtype.to_dict(numeric_type=self.numeric_type, none_to=self.none_to)
