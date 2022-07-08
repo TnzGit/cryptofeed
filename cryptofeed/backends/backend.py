@@ -131,10 +131,12 @@ class BackendBookCallback:
 
 class BackendIntervalCallback:
     async def __call__(self, dtype, receipt_timestamp: float):
-        if receipt_timestamp%self.snapshot_interval - self.time_last_received%self.snapshot_interval < 0:
+        if dtype.symbol not in self.time_last_received:
+            self.time_last_received[dtype.symbol] = 0
+        if receipt_timestamp%self.snapshot_interval - self.time_last_received[dtype.symbol]%self.snapshot_interval < 0:
             data = dtype.to_dict(numeric_type=self.numeric_type, none_to=self.none_to)
             if not dtype.timestamp:
                 data['timestamp'] = receipt_timestamp
             data['receipt_timestamp'] = receipt_timestamp
             await self.write(data)
-        self.time_last_received = receipt_timestamp
+        self.time_last_received[dtype.symbol] = receipt_timestamp
