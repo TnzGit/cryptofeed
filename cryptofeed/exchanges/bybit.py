@@ -314,13 +314,17 @@ class Bybit(Feed):
                 )
                 await self.callback(INDEX, i, timestamp)
 
+            if 'next_funding_time' in info:
+                next_funding_time = info['next_funding_time'].timestamp()
+            else:
+                next_funding_time = 0
             if 'funding_rate_e6' in info:
                 f = Funding(
                     self.id,
                     self.exchange_symbol_to_std_symbol(info['symbol']),
                     None,
                     Decimal(info['funding_rate_e6']) * Decimal('1e-6'),
-                    info['next_funding_time'].timestamp(),
+                    next_funding_time,
                     ts,
                     predicted_rate=Decimal(info['predicted_funding_rate_e6']) * Decimal('1e-6'),
                     raw=info
