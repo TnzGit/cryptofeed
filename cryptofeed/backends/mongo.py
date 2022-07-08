@@ -53,7 +53,7 @@ class FundingMongo(MongoCallback, BackendIntervalCallback):
 
     def __init__(self, *args, snapshot_interval=60, **kwargs):
         self.snapshot_interval = snapshot_interval
-        self.time_last_received = 0
+        self.time_last_received = {}
         super().__init__(*args, **kwargs)
 
 
